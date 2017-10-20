@@ -4,7 +4,7 @@ import sys
 import argparse
 import json
 import logging
-import collections
+import socket
 from apollo.ApolloInstance import ApolloInstance
 from util.Reader import Reader
 from util.Logger import Logger
@@ -31,9 +31,9 @@ def main(argv):
     # Begin init variables
     extra_files_path = reader.getExtFilesPath()
     user_email = reader.getUserEmail() 
-    genome_name = reader.getGenomeName()
     species_name = reader.getSpeciesName() 
-    apollo_host = reader.getApolloHost()
+    #apollo_host = reader.getApolloHost()
+    apollo_host = "http://localhost:8080/apollo"
     apollo_user = reader.getApolloUser()
     toolDirectory = reader.getToolDir()
     jbrowse_hub = reader.getJBrowseHubDir()
@@ -49,18 +49,25 @@ def main(argv):
 
     # Set up apollo
     apollo = ApolloInstance(apollo_host, toolDirectory, user_email)
-    jbrowse_hub_dir = _getHubDir(jbrowse_hub, extra_files_path, genome_name)
+    jbrowse_hub_dir = _getHubDir(jbrowse_hub, extra_files_path)
     apollo.loadHubToApollo(apollo_user, species_name, jbrowse_hub_dir, admin=True)
     outHtml(outputFile, apollo_host, species_name)
 
     logging.info('#### JBrowseArchiveCreator: Congratulation! JBrowse Hub is uploaded! ####\n')
     
-def _getHubDir(outputFile, extra_files_path, genome_name):
-    file_dir = os.path.abspath(outputFile)
-    source_dir = os.path.dirname(file_dir)
+def _getHubDir(outputFile, extra_files_path):
+    dataset_dir = os.path.dirname(outputFile)
+    print ("dataset_dir: ", dataset_dir)
     output_folder_name = os.path.basename(extra_files_path)
-    jbrowse_hub_dir = os.path.join(source_dir, output_folder_name, 'myHub', genome_name)
-    return jbrowse_hub_dir
+    print ("output_folder_name: ", output_folder_name)
+    source_dir = os.path.join(dataset_dir, output_folder_name)
+    print ("source_dir: ", source_dir)
+    for root, dirs, files in os.walk(source_dir):
+        for name in files:
+            if name == "trackList.json":
+                return root
+    logging.error("Cannot find jbrowsehub")
+    exit(1)
 
 def outHtml(outputFile, host_name, species_name):
     with open(outputFile, 'w') as htmlfile:

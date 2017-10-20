@@ -11,6 +11,7 @@
     </stdio>
 
     <command detect_errors="exit_code"><![CDATA[
+
         ## Dump the tool parameters into a JSON file 
         python $json_file parameters.json;
         python $__tool_directory__/jbrowsehubToApollo.py --data_json parameters.json -o $output
@@ -22,9 +23,9 @@ import sys
 
 file_path = sys.argv[1]
 #set global data_parameter_dict = {}
+##silent $data_parameter_dict.update({"apollo_host": $apollo_host})
 #silent $data_parameter_dict.update({"jbrowse_hub": str($jbrowse_hub)})
 #silent $data_parameter_dict.update({"species_name": str($species_name)})
-#silent $data_parameter_dict.update({"apollo_host": str($apollo_host)})
 #silent $data_parameter_dict.update({"user_email": str($__user_email__)})
 #silent $data_parameter_dict.update({"tool_directory": str($__tool_directory__)})
 #silent $data_parameter_dict.update({"extra_files_path": str($jbrowse_hub.extra_files_path)})
@@ -52,11 +53,6 @@ with open(file_path, 'w') as f:
                 size="30"
                 value="unknown"
                 label="Species name"
-        />
-        <param
-                name="apollo_host"
-                type="text"
-                label="Apollo host"
         />
         <conditional name="apollo_users_settings">
             <param name="apollo_users_selector" type="select" label="Create or specify your Apollo account">

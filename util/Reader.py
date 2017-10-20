@@ -2,6 +2,7 @@ import json
 import re
 import logging
 import codecs
+import socket
 from apollo.ApolloUser import ApolloUser
 from util import santitizer 
 
@@ -56,26 +57,17 @@ class Reader(object):
             exit(1)
     
     def getApolloHost(self):
-        apollo_host = self.args.get("apollo_host")
+        #apollo_host = self.args.get("apollo_host")
+        hostname = socket.gethostname()
+        ip = socket.gethostbyname(hostname)
+        protocol = socket.getprotobyname(hostname)
+        apollo_host = str(protocol) + str(ip)
         return apollo_host
         
         
     def getSpeciesName(self):
         species_name = santitizer.sanitize_name_input(self.args["species_name"])
         return species_name 
-        
-    def getGenomeName(self):
-        jbrowse_hub = self.getJBrowseHubDir()
-        with open(jbrowse_hub, 'r') as f:
-            html = f.read()
-            print html
-        m = re.search('The new Organism "(.+?)" is created on Apollo', html)
-        if m:
-            genome_name = m.group(1)
-        else:
-            print("Cannot find genome name in the jbrowse hub file!")
-            exit(1)
-        return genome_name
             
 
     def getApolloUser(self):
