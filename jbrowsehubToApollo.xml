@@ -23,8 +23,6 @@ import sys
 
 file_path = sys.argv[1]
 #set global data_parameter_dict = {}
-##silent $data_parameter_dict.update({"apollo_host": $apollo_host})
-#silent $data_parameter_dict.update({"jbrowse_hub": str($jbrowse_hub)})
 #silent $data_parameter_dict.update({"species_name": str($species_name)})
 #silent $data_parameter_dict.update({"user_email": str($__user_email__)})
 #silent $data_parameter_dict.update({"tool_directory": str($__tool_directory__)})
@@ -71,11 +69,14 @@ with open(file_path, 'w') as f:
                     type="text"
                     label="Last Name"
                 />
-                <param
-                    name="user_email"
-                    type="text"
-                    label="Email Address"
-                />
+                <param name="user_email" type="text" label="Email Address">
+                    <sanitizer>
+                        <valid initial="string.letters,string.digits">
+                            <add value="@-=_.()/+*^,:?!"/>
+                        </valid>
+                    </sanitizer>
+                </param>
+                
                 <param
                     name="password"
                     type="text"

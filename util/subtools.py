@@ -143,3 +143,18 @@ def arrow_get_users(user_email):
             return d['userId']
     logging.error("Cannot find user %s", user_email)
 
+def verify_user_login(username, password):
+    user_info = {'username': username, 'password': password}
+    array_call = ['curl', 
+                  '-b', 'cookies.txt', 
+                  '-c', 'cookies.txt', 
+                  '-H', 'Content-Type:application/json',
+                  '-d', json.dumps(user_info),
+                  'http://localhost:8080/apollo/Login?operation=login'
+                  ]
+    p = subprocess.check_output(array_call)
+    msg = json.loads(p)
+    if 'error' in msg:
+        logging.error("The Authentication for user %s failed. Get error message %s", username, msg['error'])
+        exit(1)
+        

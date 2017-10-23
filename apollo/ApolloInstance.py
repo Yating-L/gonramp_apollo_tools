@@ -4,27 +4,28 @@ import json
 import shutil
 import tempfile
 import logging
+import random
+import string
 from util import subtools
 from mako.lookup import TemplateLookup
 
 
 class ApolloInstance(object):
-    def __init__(self, apollo_host, tool_directory, user_email):
+    def __init__(self, apollo_host, tool_directory):
         self.apollo_host = apollo_host
         self.tool_directory = tool_directory
-        self.default_user = user_email
         self.logger = logging.getLogger(__name__)
         self.apolloTemplate = self._getApolloTemplate()
         self._arrow_init()
     
-    #TODO: Encode password
+    
     def _arrow_init(self):
         arrow_config = tempfile.NamedTemporaryFile(bufsize=0)
         with open(arrow_config.name, 'w') as conf:
             htmlMakoRendered = self.apolloTemplate.render(
             apollo_host = self.apollo_host,
-            admin_user = self.default_user,
-            admin_pw = '1234'
+            admin_user = 'super@apolloadmin.com',
+            admin_pw = 'demo'
         )
             conf.write(htmlMakoRendered)
 
@@ -32,7 +33,14 @@ class ApolloInstance(object):
         arrow_config_dir = os.path.join(home_dir, '.apollo-arrow.yml')
         shutil.copyfile(arrow_config.name, arrow_config_dir)
         self.logger.debug("Initated arrow: apollo-arrow.yml= %s", arrow_config_dir)
-
+    
+    #TODO: Encode admin password
+    '''
+    def _generatePassword(self, length=8):
+        chars = string.digits + string.letters
+        pw = ''.join([random.choice(chars) for _ in range(length)])
+        return pw
+    '''
 
     def _getApolloTemplate(self):
         mylookup = TemplateLookup(directories=[os.path.join(self.tool_directory, 'templates')],
@@ -49,8 +57,9 @@ class ApolloInstance(object):
         user_id = user_info.get('userId')
         if not user_id:
             self.logger.debug("Cannot create new user: %s; The user may already exist", apollo_user.user_email)
+            subtools.verify_user_login(apollo_user.user_email, apollo_user.password)
             user_id = subtools.arrow_get_users(apollo_user.user_email)
-        self.logger.debug("Got user_id for new or existing user: user_id = %s", str(user_id))
+            self.logger.debug("Got user_id for new or existing user: user_id = %s", str(user_id))
         return user_id   
 
     def grantPermission(self, user_id, organism_id, **user_permissions):

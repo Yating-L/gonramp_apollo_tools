@@ -36,7 +36,7 @@ def main(argv):
     apollo_host = "http://localhost:8080/apollo"
     apollo_user = reader.getApolloUser()
     toolDirectory = reader.getToolDir()
-    jbrowse_hub = reader.getJBrowseHubDir()
+    #jbrowse_hub = reader.getJBrowseHubDir()
     debug_mode = reader.getDebugMode()
 
     #### Logging management ####
@@ -48,23 +48,18 @@ def main(argv):
     logging.debug('JSON parameters: %s\n\n', json.dumps(reader.args))
 
     # Set up apollo
-    apollo = ApolloInstance(apollo_host, toolDirectory, user_email)
-    jbrowse_hub_dir = _getHubDir(jbrowse_hub, extra_files_path)
+    apollo = ApolloInstance(apollo_host, toolDirectory) 
+    jbrowse_hub_dir = _getHubDir(extra_files_path)
     apollo.loadHubToApollo(apollo_user, species_name, jbrowse_hub_dir, admin=True)
     outHtml(outputFile, apollo_host, species_name)
 
     logging.info('#### JBrowseArchiveCreator: Congratulation! JBrowse Hub is uploaded! ####\n')
     
-def _getHubDir(outputFile, extra_files_path):
-    dataset_dir = os.path.dirname(outputFile)
-    print ("dataset_dir: ", dataset_dir)
-    output_folder_name = os.path.basename(extra_files_path)
-    print ("output_folder_name: ", output_folder_name)
-    source_dir = os.path.join(dataset_dir, output_folder_name)
-    print ("source_dir: ", source_dir)
-    for root, dirs, files in os.walk(source_dir):
+def _getHubDir(extra_files_path):
+    for root, dirs, files in os.walk(extra_files_path):
         for name in files:
             if name == "trackList.json":
+                logging.debug("JBrowse hub directory: %s", root)
                 return root
     logging.error("Cannot find jbrowsehub")
     exit(1)
