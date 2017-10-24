@@ -68,8 +68,7 @@ def _handleExceptionAndCheckCall(array_call, **kwargs):
                 raise PopenError(cmd, error, p.returncode)
             else:
                 # TODO: To Handle properly with a design behind, if we received a option as a file for the error
-                raise Exception("Error when calling {0}. Error as been logged in your file {1}. Error code: {2}"
-                                .format(cmd, stderr.name, p.returncode))
+                raise Exception("Error when calling {0}. Error as been logged in your file {1}. Error code: {2}".format(cmd, stderr.name, p.returncode))
 
     except OSError as e:
         message = "The subprocess {0} has encountered an OSError: {1}".format(
@@ -94,14 +93,14 @@ def _handleExceptionAndCheckCall(array_call, **kwargs):
         logging.exception(message)
 
         sys.exit(-1)
-    return p
+    return output
 
 def arrow_add_organism(organism_name, organism_dir, public=False):
     array_call = ['arrow', 'organisms', 'add_organism', organism_name, organism_dir]
     if public:
         array_call.append('--public')
-    print array_call
-    p = subprocess.check_output(array_call)
+    p = _handleExceptionAndCheckCall(array_call)
+    #p = subprocess.check_output(array_call)
     return p
 
 def arrow_create_user(user_email, firstname, lastname, password, admin=False):
@@ -143,18 +142,19 @@ def arrow_get_users(user_email):
             return d['userId']
     logging.error("Cannot find user %s", user_email)
 
-def verify_user_login(username, password):
+def verify_user_login(username, password, apollo_host):
     user_info = {'username': username, 'password': password}
     array_call = ['curl', 
                   '-b', 'cookies.txt', 
                   '-c', 'cookies.txt', 
                   '-H', 'Content-Type:application/json',
                   '-d', json.dumps(user_info),
-                  'http://localhost:8080/apollo/Login?operation=login'
+                  apollo_host + '/Login?operation=login'
                   ]
-    p = subprocess.check_output(array_call)
+    p = _handleExceptionAndCheckCall(array_call)
     msg = json.loads(p)
     if 'error' in msg:
         logging.error("The Authentication for user %s failed. Get error message %s", username, msg['error'])
-        exit(1)
+        exit(-1)
+    
         

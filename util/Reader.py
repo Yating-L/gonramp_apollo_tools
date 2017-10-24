@@ -55,6 +55,13 @@ class Reader(object):
         except KeyError:
             print ("debug_mode is not defined in the input file!")
             exit(1)
+            
+    def getPortNum(self):
+        try:
+            return self.args["port"]
+        except KeyError:
+            print ("port is not defined in the input file!")
+            exit(1)
     
     def getApolloHost(self):
         #apollo_host = self.args.get("apollo_host")
@@ -68,7 +75,13 @@ class Reader(object):
     def getSpeciesName(self):
         species_name = santitizer.sanitize_name_input(self.args["species_name"])
         return species_name 
-            
+
+    def getAdminUser(self):
+        admin_info = self.args.get("apollo_admin")
+        user_email = admin_info['user_email']
+        password = admin_info['password']
+        apollo_admin = ApolloUser(user_email, password)
+        return apollo_admin    
 
     def getApolloUser(self):
         user_info = self.args.get("apollo_user")

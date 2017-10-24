@@ -30,11 +30,14 @@ def main(argv):
 
     # Begin init variables
     extra_files_path = reader.getExtFilesPath()
-    user_email = reader.getUserEmail() 
+    #user_email = reader.getUserEmail() 
     species_name = reader.getSpeciesName() 
     #apollo_host = reader.getApolloHost()
-    apollo_host = "http://localhost:8080/apollo"
-    apollo_user = reader.getApolloUser()
+    apollo_port = reader.getPortNum()
+    apollo_host = "http://localhost:"+ apollo_port + "/apollo"
+    #apollo_host = "http://localhost:8080/apollo"
+    #apollo_user = reader.getApolloUser()
+    apollo_admin_user = reader.getAdminUser()
     toolDirectory = reader.getToolDir()
     #jbrowse_hub = reader.getJBrowseHubDir()
     debug_mode = reader.getDebugMode()
@@ -48,9 +51,9 @@ def main(argv):
     logging.debug('JSON parameters: %s\n\n', json.dumps(reader.args))
 
     # Set up apollo
-    apollo = ApolloInstance(apollo_host, toolDirectory) 
+    apollo = ApolloInstance(apollo_host, apollo_admin_user, toolDirectory) 
     jbrowse_hub_dir = _getHubDir(extra_files_path)
-    apollo.loadHubToApollo(apollo_user, species_name, jbrowse_hub_dir, admin=True)
+    apollo.loadHubToApollo(apollo_admin_user, species_name, jbrowse_hub_dir, admin=True)
     outHtml(outputFile, apollo_host, species_name)
 
     logging.info('#### JBrowseArchiveCreator: Congratulation! JBrowse Hub is uploaded! ####\n')
@@ -62,7 +65,7 @@ def _getHubDir(extra_files_path):
                 logging.debug("JBrowse hub directory: %s", root)
                 return root
     logging.error("Cannot find jbrowsehub")
-    exit(1)
+    exit(-1)
 
 def outHtml(outputFile, host_name, species_name):
     with open(outputFile, 'w') as htmlfile:

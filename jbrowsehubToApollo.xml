@@ -24,13 +24,12 @@ import sys
 file_path = sys.argv[1]
 #set global data_parameter_dict = {}
 #silent $data_parameter_dict.update({"species_name": str($species_name)})
-#silent $data_parameter_dict.update({"user_email": str($__user_email__)})
+#set apollo_admin = {"user_email": str($admin_username), "password": str($admin_password)}
+#silent $data_parameter_dict.update({"apollo_admin": $apollo_admin})
+##silent $data_parameter_dict.update({"user_email": str($__user_email__)})
 #silent $data_parameter_dict.update({"tool_directory": str($__tool_directory__)})
 #silent $data_parameter_dict.update({"extra_files_path": str($jbrowse_hub.extra_files_path)})
-#if $apollo_users_settings.apollo_users_selector == "yes":
-    #set apollo_user = {"firstname": str($apollo_users_settings.firstname), "lastname": str($apollo_users_settings.lastname), "password": str($apollo_users_settings.password), "user_email": str($apollo_users_settings.user_email)}
-    $data_parameter_dict.update({"apollo_user": $apollo_user})
-#end if 
+#silent $data_parameter_dict.update({"port": str($advanced_options.port)})
 #silent $data_parameter_dict.update({"debug_mode": str($advanced_options.debug_mode)})
 with open(file_path, 'w') as f:
     json.dump($data_parameter_dict, f)
@@ -52,43 +51,18 @@ with open(file_path, 'w') as f:
                 value="unknown"
                 label="Species name"
         />
-        <conditional name="apollo_users_settings">
-            <param name="apollo_users_selector" type="select" label="Create or specify your Apollo account">
-                <option value="no" selected="true">Use exist demo user account (will use your galaxy email address for apollo, password: gonramp) </option>
-                <option value="yes">Create or use your own Apollo account</option>
-            </param>
-            <!-- TODO: Avoid redundancy here -->
-            <when value="yes">
-                <param
-                    name="firstname"
-                    type="text"
-                    label="First Name"
-                />
-                <param
-                    name="lastname"
-                    type="text"
-                    label="Last Name"
-                />
-                <param name="user_email" type="text" label="Email Address">
-                    <sanitizer>
-                        <valid initial="string.letters,string.digits">
-                            <add value="@-=_.()/+*^,:?!"/>
-                        </valid>
-                    </sanitizer>
-                </param>
-                
-                <param
-                    name="password"
-                    type="text"
-                    label="Password"
-                />
-            </when>
-            <when value="no">
-                <param name="default_user" type="hidden"
-                       value="false">
-                </param>
-            </when>
-        </conditional>
+        <param name="admin_username" type="text" label="Admin username" help="Login in with Apollo admin account">
+            <sanitizer>
+                <valid initial="string.letters,string.digits">
+                    <add value="@-=_.()/+*^,:?!"/>
+                </valid>
+            </sanitizer>
+        </param>
+        <param
+            name="admin_password"
+            type="text"
+            label="Admin password"
+        />
         <conditional name="advanced_options">
             <param name="advanced_options_selector" type="select" label="Advanced options">
                 <option value="off" selected="true">Hide advanced options</option>
@@ -96,6 +70,7 @@ with open(file_path, 'w') as f:
             </param>
             <!-- TODO: Avoid redundancy here -->
             <when value="on">
+                <param name="port" type="integer" min="8000" max="8888" value="8080" label="Port number of Apollo" />
                 <param name="debug_mode" type="select" label="Activate debug mode"> 
                     <option value="false" selected="true">No</option>
                     <option value="true">Yes</option>
@@ -105,6 +80,7 @@ with open(file_path, 'w') as f:
                 </param>
             </when>
             <when value="off">
+                <param name="port" type="hidden" value="8080" />
                 <param name="debug_mode" type="hidden"
                        value="false">
                 </param>
