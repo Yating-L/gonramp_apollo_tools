@@ -15,15 +15,10 @@ def main(argv):
     parser.add_argument('-j', '--data_json', help='JSON file containing the metadata of the inputs')
     parser.add_argument('-o', '--output', help='HTML output')
     
-    #parser.add_argument('-e', '--extra_file_path', help='Extra file path for generated jbrowse hub')
-    #parser.add_argument('-d', '--jbrowsehub', help='Name of the HTML summarizing the content of the JBrowse Hub Archive')
-
     # Get the args passed in parameter
     args = parser.parse_args()
     json_inputs_data = args.data_json
     outputFile = args.output
-    #outputFile = args.jbrowsehub
-    
     
     ##Parse JSON file with Reader
     reader = Reader(json_inputs_data)
@@ -41,19 +36,20 @@ def main(argv):
     toolDirectory = reader.getToolDir()
     #jbrowse_hub = reader.getJBrowseHubDir()
     debug_mode = reader.getDebugMode()
+    action = reader.getAction()
 
     #### Logging management ####
     # If we are in Debug mode, also print in stdout the debug dump
     log = Logger(tool_directory=toolDirectory, debug=debug_mode, extra_files_path=extra_files_path)
     log.setup_logging()
 
-    logging.info("#### JBrowseArchiveCreator: Start to upload JBrowse Hub to Apollo instance: %s #### ", apollo_host)
+    logging.info("#### JBrowseArchiveCreator: Start to %s JBrowse Hub to Apollo instance: %s #### ", action, apollo_host)
     logging.debug('JSON parameters: %s\n\n', json.dumps(reader.args))
 
     # Set up apollo
     apollo = ApolloInstance(apollo_host, apollo_admin_user, toolDirectory) 
     jbrowse_hub_dir = _getHubDir(extra_files_path)
-    apollo.loadHubToApollo(apollo_admin_user, species_name, jbrowse_hub_dir, admin=True)
+    apollo.loadHubToApollo(species_name, jbrowse_hub_dir, action) 
     outHtml(outputFile, apollo_host, species_name)
 
     logging.info('#### JBrowseArchiveCreator: Congratulation! JBrowse Hub is uploaded! ####\n')
