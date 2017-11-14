@@ -76,6 +76,10 @@ class Reader(object):
         species_name = santitizer.sanitize_name_input(self.args["species_name"])
         return species_name 
 
+    def getAction(self):
+        action = self.args.get("action")
+        return action
+
     def getAdminUser(self):
         admin_info = self.args.get("apollo_admin")
         user_email = admin_info['user_email']

@@ -109,9 +109,10 @@ def arrow_create_user(user_email, firstname, lastname, password, admin=False):
     if admin:
         array_call += ['--role', 'admin']
     logging.debug("%s", array_call)
-    print array_call
-    p = subprocess.check_output(array_call)
-    print ("p = %s", p)
+    p = _handleExceptionAndCheckCall(array_call)
+    #print array_call
+    #p = subprocess.check_output(array_call)
+    #print ("p = %s", p)
     return p
 
 def arrow_update_organism_permissions(user_id, organism, **user_permissions):
@@ -128,20 +129,37 @@ def arrow_update_organism_permissions(user_id, organism, **user_permissions):
         array_call.append('--read')
     if export:
         array_call.append('--export')
-    p = subprocess.check_output(array_call)
+    p = _handleExceptionAndCheckCall(array_call)
+    #p = subprocess.check_output(array_call)
     return p
 
 def arrow_get_users(user_email):
     array_call = ['arrow', 'users', 'get_users']
-    logging.debug("%s", array_call)
-    print array_call
-    p = subprocess.check_output(array_call)
+    #logging.debug("%s", array_call)
+    #print array_call
+    #p = subprocess.check_output(array_call)
+    p = _handleExceptionAndCheckCall(array_call)
     all_users = json.loads(p)
     for d  in all_users:
         if d['username'] == user_email:
             return d['userId']
     logging.error("Cannot find user %s", user_email)
 
+def arrow_get_organism(organism_name):
+    array_call= ['arrow', 'organisms', 'get_organisms']
+    p = _handleExceptionAndCheckCall(array_call)
+    all_organisms = json.loads(p)
+    for org in all_organisms:
+        if org['commonName'] == organism_name:
+            print "id = " + str(org['id'])
+            return org['id']
+    
+
+def arrow_delete_organism(organism_id):
+    array_call = ['arrow', 'organisms', 'delete_organism', organism_id]
+    p = _handleExceptionAndCheckCall(array_call)
+    return p
+    
 def verify_user_login(username, password, apollo_host):
     user_info = {'username': username, 'password': password}
     array_call = ['curl', 

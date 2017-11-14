@@ -66,17 +66,63 @@ class ApolloInstance(object):
         self.logger.debug("Grant user %s permissions to organism %s, permissions = %s", str(user_id), str(organism_id), ','.join(user_permissions))
 
     def addOrganism(self, organism_name, organism_dir):
+        exist = self.getOrganism(organism_name)
+        if not exist:
+            self.logger.debug("The organism does not exist.")
+            p = subtools.arrow_add_organism(organism_name, organism_dir)
+            if not p:
+                self.logger.error("The user %s is not authorized to add organism", self.apollo_admin.user_email)
+                exit(-1)
+            organism = json.loads(p)
+            organism_id = organism['id']
+            self.logger.debug("A new organism %s was added to Apollo instance", p)
+            return organism_id
+        else:
+            self.logger.error("The organism %s already exists.", organism_name)
+            exit(-1)
+
+    #TODO: the JSON dictionary return by deleteOrganism still contains the deleted organism. Improve the API.
+    def deleteOrganism(self, organism_name):
+        organism_id = self.getOrganism(organism_name)
+        if organism_id:
+            self.logger.debug("Deleting the organism %s", organism_name)
+            subtools.arrow_delete_organism(organism_id)
+            if not self.getOrganism(organism_name):
+                self.logger.debug("Organism %s has been deleted", organism_name)
+            else:
+                self.logger.error("Organism %s cannot be deleted", organism_name)
+                exit(-1)
+        else:
+            self.logger.error("Organism %s doesn't exist", organism_name)
+            exit(-1)
+
+    #TODO: filtering by commonName doesn't work. Improve the API.
+    def getOrganism(self, organism_name):
+        p = subtools.arrow_get_organism(organism_name)
+        if p:
+            return str(p)
+
+    #TODO: API update_organism not working. Improve the API to enable updating directory.
+    def overwriteOrganism(self, organism_name, organism_dir):
+        self.deleteOrganism(organism_name)
         p = subtools.arrow_add_organism(organism_name, organism_dir)
         if not p:
             self.logger.error("The user is not authorized to add organism")
             exit(-1)
         organism = json.loads(p)
         organism_id = organism['id']
-        self.logger.debug("Added new organism to Apollo instance, %s", p)
+        self.logger.debug("A new organism %s has been added to Apollo instance", p)
         return organism_id
-
-    def loadHubToApollo(self, apollo_user, organism_name, organism_dir, admin_user=False, **user_permissions):
-        #user_id = self.createApolloUser(apollo_user, admin_user)
-        organism_id = self.addOrganism(organism_name, organism_dir)
-        #self.grantPermission(user_id, organism_id, **user_permissions)
-        self.logger.debug("Successfully load the hub to Apollo")
+        
+    
+    def loadHubToApollo(self, organism_name, organism_dir, action):
+        if action == "add":
+            self.addOrganism(organism_name, organism_dir)
+            self.logger.info("Successfully add a new organism (%s) to Apollo", organism_name)
+        elif action == "overwrite":
+            self.overwriteOrganism(organism_name, organism_dir)
+            self.logger.info("Successfully overwrite the organism %s", organism_name)
+        else:
+            self.logger.error("Invalid operation %s", action)
+            exit(-1)
+        
