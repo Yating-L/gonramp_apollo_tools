@@ -43,13 +43,21 @@ def main(argv):
     log = Logger(tool_directory=toolDirectory, debug=debug_mode)
     log.setup_logging()
 
+<<<<<<< HEAD
     logging.info("#### JBrowsehub To Apollo: Start to %s JBrowse Hub to Apollo instance: %s #### ", action, apollo_host)
+=======
+    logging.info("#### JBrowseArchiveCreator: Start to %s JBrowse Hub to Apollo instance: %s #### ", action, apollo_host)
+>>>>>>> 8b9a3b41d4dd4689764592d278ec2d67f67fbca4
     logging.debug('JSON parameters: %s\n\n', json.dumps(reader.args))
 
     # Set up apollo
     apollo = ApolloInstance(apollo_host, apollo_admin_user, toolDirectory) 
     jbrowse_hub_dir = _getHubDir(extra_files_path)
+<<<<<<< HEAD
     apollo.manageApolloOrganism(species_name, jbrowse_hub_dir, action)  
+=======
+    apollo.loadHubToApollo(species_name, jbrowse_hub_dir, action) 
+>>>>>>> 8b9a3b41d4dd4689764592d278ec2d67f67fbca4
     outHtml(outputFile, apollo_host, species_name)
 
     logging.info('#### JBrowsehub To Apollo: Congratulation! JBrowse Hub is uploaded! ####\n')
