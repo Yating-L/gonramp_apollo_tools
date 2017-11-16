@@ -14,7 +14,8 @@ class Logger(object):
         self.extra_files_path = extra_files_path
 
     def setup_logging(self):
-        """Setup logging configuration
+        """
+        Setup logging configuration
         reference: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
         """
         config_path = os.path.join(self.tool_directory, 'logging.json')

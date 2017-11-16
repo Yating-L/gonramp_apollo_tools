@@ -104,16 +104,59 @@ def arrow_add_organism(organism_name, organism_dir, public=False):
     return p
 
 def arrow_create_user(user_email, firstname, lastname, password, admin=False):
-    """ Create a new user of Apollo, the default user_role is "user" """
+    """ 
+    Create a new user of Apollo, the default user_role is "user" 
+    """
     array_call = ['arrow', 'users', 'create_user', user_email, firstname, lastname, password]
     if admin:
         array_call += ['--role', 'admin']
-    logging.debug("%s", array_call)
     p = _handleExceptionAndCheckCall(array_call)
-    #print array_call
-    #p = subprocess.check_output(array_call)
-    #print ("p = %s", p)
-    return p
+    j = json.loads(p)
+    if "userId" in j:
+        return j['userId']
+    elif "error" in j:
+        logging.error("User %s already exist", user_email)
+        raise Exception(j['error'])
+        
+        
+def arrow_delete_user(user_email):
+    array_call = ['arrow', 'users', 'delete_user', user_email]
+    p = _handleExceptionAndCheckCall(array_call)
+    j = json.loads(p)
+    if "error" in j:
+        raise Exception(j['error'])
+
+def arrow_add_to_group(groupname, user_email):
+    if not arrow_get_groups(groupname):
+        arrow_create_group(groupname)
+    array_call = ['arrow', 'users', 'add_to_group', groupname, user_email]
+    p = _handleExceptionAndCheckCall(array_call)
+    j = json.loads(p)
+    if j != dict():
+        raise Exception("Error add user %s to group %s", user_email, groupname)
+
+
+def arrow_remove_from_group(groupname, user_email):
+    if arrow_get_groups(groupname):
+        array_call = ['arrow', 'users', 'remove_from_group', groupname, user_email]
+        p = _handleExceptionAndCheckCall(array_call)
+    else:
+        raise Exception("Group %s doesn't exist. Check if you spell the name correctly", groupname)
+
+def arrow_create_group(groupname):
+    if arrow_get_groups(groupname):
+        raise Exception("Group %s already exist. Create a group with another name.", groupname)
+    array_call = ['arrow', 'groups', 'create_group', groupname]
+    p = _handleExceptionAndCheckCall(array_call)
+
+def arrow_get_groups(groupname):
+    array_call = ['arrow', 'groups', 'get_groups']
+    p = _handleExceptionAndCheckCall(array_call)
+    all_groups = json.loads(p)
+    for g in all_groups:
+        if g['name'] == groupname:
+            return True
+    return False
 
 def arrow_update_organism_permissions(user_id, organism, **user_permissions):
     array_call = ['arrow', 'users', 'update_organism_permissions', str(user_id), str(organism)]
@@ -130,14 +173,10 @@ def arrow_update_organism_permissions(user_id, organism, **user_permissions):
     if export:
         array_call.append('--export')
     p = _handleExceptionAndCheckCall(array_call)
-    #p = subprocess.check_output(array_call)
     return p
 
 def arrow_get_users(user_email):
     array_call = ['arrow', 'users', 'get_users']
-    #logging.debug("%s", array_call)
-    #print array_call
-    #p = subprocess.check_output(array_call)
     p = _handleExceptionAndCheckCall(array_call)
     all_users = json.loads(p)
     for d  in all_users:
@@ -151,7 +190,6 @@ def arrow_get_organism(organism_name):
     all_organisms = json.loads(p)
     for org in all_organisms:
         if org['commonName'] == organism_name:
-            print "id = " + str(org['id'])
             return org['id']
     
 

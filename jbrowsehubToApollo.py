@@ -40,19 +40,19 @@ def main(argv):
 
     #### Logging management ####
     # If we are in Debug mode, also print in stdout the debug dump
-    log = Logger(tool_directory=toolDirectory, debug=debug_mode, extra_files_path=extra_files_path)
+    log = Logger(tool_directory=toolDirectory, debug=debug_mode)
     log.setup_logging()
 
-    logging.info("#### JBrowseArchiveCreator: Start to %s JBrowse Hub to Apollo instance: %s #### ", action, apollo_host)
+    logging.info("#### JBrowsehub To Apollo: Start to %s JBrowse Hub to Apollo instance: %s #### ", action, apollo_host)
     logging.debug('JSON parameters: %s\n\n', json.dumps(reader.args))
 
     # Set up apollo
     apollo = ApolloInstance(apollo_host, apollo_admin_user, toolDirectory) 
     jbrowse_hub_dir = _getHubDir(extra_files_path)
-    apollo.loadHubToApollo(species_name, jbrowse_hub_dir, action) 
+    apollo.manageApolloOrganism(species_name, jbrowse_hub_dir, action)  
     outHtml(outputFile, apollo_host, species_name)
 
-    logging.info('#### JBrowseArchiveCreator: Congratulation! JBrowse Hub is uploaded! ####\n')
+    logging.info('#### JBrowsehub To Apollo: Congratulation! JBrowse Hub is uploaded! ####\n')
     
 def _getHubDir(extra_files_path):
     for root, dirs, files in os.walk(extra_files_path):

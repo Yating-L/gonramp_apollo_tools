@@ -81,25 +81,12 @@ class Reader(object):
         return action
 
     def getAdminUser(self):
-        admin_info = self.args.get("apollo_admin")
-        user_email = admin_info['user_email']
-        password = admin_info['password']
-        apollo_admin = ApolloUser(user_email, password)
+        apollo_admin = self.args.get("apollo_admin")
         return apollo_admin    
 
-    def getApolloUser(self):
-        user_info = self.args.get("apollo_user")
-        if not user_info:
-            firstname = "demo"
-            lastname = "user"
-            password = "gonramp"
-            user_email = self.getUserEmail()
-        else:
-            firstname = user_info['firstname']
-            lastname = user_info['lastname']
-            user_email = user_info['user_email']
-            password = user_info['password']
-        apollo_user = ApolloUser(user_email, firstname, lastname, password)
-        return apollo_user
+
+    def getOperationList(self):
+        l = self.args.get("operations")
+        return l
 
     
