@@ -1,7 +1,10 @@
 <tool id="apollo_user_manager" name="Apollo User Manager" version="1.0.0">
     <description>
-        This Galaxy tool is used to manage Apollo users
+        This Galaxy tool is used to manage Apollo users. 
     </description>
+    <macros>
+        <import>macros.xml</import>
+    </macros>
 
     <requirements>
         <requirement type="package" version="3.0.3">apollo_api</requirement>
@@ -48,7 +51,8 @@ file_path = sys.argv[1]
                             "password": str($f.operation_type_selector.batch_selector.password)}
             
         #else 
-            #set data_dict = {"false_path": str($f.operation_type_selector.batch_selector.user_info_file)}
+            #set data_dict = {"format": str($f.operation_type_selector.batch_selector.format), 
+                                "false_path": str($f.operation_type_selector.batch_selector.user_info_file)}
         #end if 
         #silent $prepare_json("create", $data_dict, $batch)
     
@@ -57,7 +61,8 @@ file_path = sys.argv[1]
         #if $batch == "false"
             #set data_dict = {"useremail": str($f.operation_type_selector.batch_selector.user_email)}
         #else 
-            #set data_dict = {"false_path": str($f.operation_type_selector.batch_selector.user_info_file)}
+            #set data_dict = {"format": str($f.operation_type_selector.batch_selector.format), 
+                                "false_path": str($f.operation_type_selector.batch_selector.user_info_file)}
         #end if 
         #silent $prepare_json("delete", $data_dict, $batch)
     #elif $f.operation_type_selector.operation_type == "add"
@@ -66,7 +71,8 @@ file_path = sys.argv[1]
             #set data_dict = {"useremail": str($f.operation_type_selector.batch_selector.user_email),
                         "group": str($f.operation_type_selector.batch_selector.group_name)}
         #else 
-            #set data_dict = {"false_path": str($f.operation_type_selector.batch_selector.user_info_file)}
+            #set data_dict = {"format": str($f.operation_type_selector.batch_selector.format), 
+                                "false_path": str($f.operation_type_selector.batch_selector.user_info_file)}
         #end if 
         #silent $prepare_json("add", $data_dict, $batch)
     #elif $f.operation_type_selector.operation_type == "remove"
@@ -75,7 +81,8 @@ file_path = sys.argv[1]
             #set data_dict = {"useremail": str($f.operation_type_selector.batch_selector.user_email),
                         "group": str($f.operation_type_selector.batch_selector.group_name)}
         #else 
-            #set data_dict = {"false_path": str($f.operation_type_selector.batch_selector.user_info_file)}
+            #set data_dict = {"format": str($f.operation_type_selector.batch_selector.format), 
+                                "false_path": str($f.operation_type_selector.batch_selector.user_info_file)}
         #end if 
         #silent $prepare_json("remove", $data_dict, $batch)
     #end if
@@ -135,7 +142,7 @@ with open(file_path, 'w') as f:
                             <param name="password" type="text" label="Password" />
                         </when>
                         <when value="true">
-                            <param name="user_info_file" type="data" format="tabular" label="A tabular file stored a list of users' email, firstname, lastname, password" help="tab delimited file. Header: useremail, firstname, lastname, password" />
+                            <expand macro="upload_text_file" />
                         </when>
                     </conditional>
                 </when>
@@ -155,7 +162,7 @@ with open(file_path, 'w') as f:
                             </param>
                         </when>
                         <when value="true">
-                            <param name="user_info_file" type="data" format="tabular" label="A tabular file stored a list of users' email" help="tab delimited file. Header: useremail" />
+                            <expand macro="upload_text_file" />
                         </when>
                     </conditional>
                 </when>
@@ -176,7 +183,7 @@ with open(file_path, 'w') as f:
                             <param type="text" name="group_name" size="30" value="unknown" label="Group name" />
                         </when>
                         <when value="true">
-                            <param name="user_info_file" type="data" format="tabular" label="A tabular file stored users email and group name" help="tab delimited file. Header: useremail, group" />
+                            <expand macro="upload_text_file" />                        
                         </when>
                     </conditional>
                 </when>
@@ -197,7 +204,7 @@ with open(file_path, 'w') as f:
                             <param type="text" name="group_name" size="30" value="unknown" label="Group name" />
                         </when>
                         <when value="true">
-                            <param name="user_info_file" type="data" format="tabular" label="A tabular file stored users email and group name" help="tab delimited file. Header: useremail, group" />
+                            <expand macro="upload_text_file" />                        
                         </when>
                     </conditional>
                 </when>
@@ -233,7 +240,49 @@ with open(file_path, 'w') as f:
     </outputs>
 
     <help>
-        This Galaxy tool is used to manage Apollo users.
+        This Galaxy tool is used to manage Apollo users.The currently supported operation including:
+
+  - Create a new user 
+  - Delete a user
+  - Add a user to a group (If the group doesn't exist, create the group)
+  - Remove a user to a group
+
+The tool can do these operations on one student at a time. It can also do the operations on multiple students at a time by uploading a text file, which including students information.
+
+The text file can be either CSV (comma-delimited) or Tabular (tab-delimited). It should have a header line, including names for each column. Example text files: 
+
+Text file for creating multiple users:
+
+.. csv-table:: 
+   :header: "useremail", "firstname", "lastname", "password"
+   :widths: 20, 10, 10, 10
+
+   "test1@demo.com", "test1", "demo", "1234"
+   "test2@demo.com", "test2", "demo", "1234"
+   "test3@demo.com", "test3", "demo", "1234"
+
+
+Text file for deleting multiple users:
+
+.. csv-table:: 
+    :header: "useremail"
+    :widths: 20
+
+    "test1@demo.com"
+    "test2@demo.com"
+    "test3@demo.com"
+
+
+Text file for adding / removing multiple users from a group:
+
+.. csv-table:: 
+   :header: "useremail", "group"
+   :widths: 20, 20
+
+   "test1@demo.com", "annotation_group1"
+   "test2@demo.com", "annotation_group1"
+   "test3@demo.com", "annotation_group1"
+
     </help>
     <citations>
     </citations>

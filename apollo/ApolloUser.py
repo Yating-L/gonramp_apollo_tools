@@ -22,19 +22,26 @@ class ApolloUser(object):
             if user['batch'] == "false":
                 subtools.arrow_create_user(user['useremail'], user['firstname'], user['lastname'], user['password'])
             elif user['batch'] == "true":
-                users = self.parseUserInfoFile(user['false_path'])
+                users = self.parseUserInfoFile(user['format'], user['false_path'])
                 for u in users:
                     subtools.arrow_create_user(u['useremail'], u['firstname'], u['lastname'], u['password'])
     
-    @staticmethod
-    def parseUserInfoFile(filename):
+    
+    def parseUserInfoFile(self, file_format, filename):
+        if file_format == "tab":
+            delimiter = '\t'
+        elif file_format == "csv":
+            delimiter = ','
+        else:
+            self.logger.error("The %s format is not supported!", file_format)
         with open(filename, 'r') as f:
             lines = f.readlines()
-        headers = lines[0].rstrip().split('\t')
+        headers = lines[0].rstrip().split(delimiter)
         users = []
         lines = lines[1:]
         for l in lines:
-            l = l.split('\t')
+            print l
+            l = l.split(delimiter)
             info = dict()
             fields = len(l)
             for i in range(fields):
@@ -47,7 +54,7 @@ class ApolloUser(object):
             if user['batch'] == "false":
                 subtools.arrow_delete_user(user['useremail'])
             elif user['batch'] == "true":
-                users = self.parseUserInfoFile(user['false_path']) 
+                users = self.parseUserInfoFile(user['format'], user['false_path']) 
                 for u in users:
                     subtools.arrow_delete_user(u['useremail'])
 
@@ -56,7 +63,7 @@ class ApolloUser(object):
             if user['batch'] == "false":
                 subtools.arrow_add_to_group(user['group'], user['useremail'])
             elif user['batch'] == "true":
-                users = self.parseUserInfoFile(user['false_path'])
+                users = self.parseUserInfoFile(user['format'], user['false_path'])
                 for u in users:
                     subtools.arrow_add_to_group(u['group'], u['useremail'])
                 
@@ -65,12 +72,8 @@ class ApolloUser(object):
             if user['batch'] == "false":
                 subtools.arrow_remove_from_group(user['group'], user['useremail'])
             elif user['batch'] == "true":
-                users = self.parseUserInfoFile(user['false_path'])
+                users = self.parseUserInfoFile(user['format'], user['false_path'])
                 for u in users:
                     subtools.arrow_add_to_group(u['group'], u['useremail'])
                 
-                
-
-    def grantPermission(self, user_id, organism_id, **user_permissions):
-        subtools.arrow_update_organism_permissions(user_id, organism_id, **user_permissions)
-        self.logger.debug("Grant user %s permissions to organism %s, permissions = %s", str(user_id), str(organism_id), ','.join(user_permissions))
+            

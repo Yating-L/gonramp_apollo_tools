@@ -24,7 +24,7 @@ class ApolloOrganism(object):
             self.logger.debug("A new organism %s was added to Apollo instance", p)
             return organism_id
         else:
-            self.logger.error("The organism %s already exists! Rerun the tool to use a different species name or choose to overwrite the organism", organism_name)
+            self.logger.error("The organism %s is already on Apollo instance! Rerun the tool to use a different species name or choose to overwrite the organism", self.organism_name)
             exit(-1)
 
     #TODO: the JSON dictionary return by deleteOrganism still contains the deleted organism. Improve the API.
