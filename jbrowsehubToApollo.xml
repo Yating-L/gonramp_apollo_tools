@@ -1,6 +1,6 @@
 <tool id="jbrowsehubtoapollo" name="JBrowseHub To Apollo" version="1.0.0">
     <description>
-        This Galaxy tool is used to prepare your files to be ready for displaying on JBrowse with Apollo plugin
+        This Galaxy tool is used to prepare your files to be ready for displaying on Apollo
     </description>
 
     <requirements>
@@ -101,7 +101,7 @@ with open(file_path, 'w') as f:
     </outputs>
 
     <help>
-        This Galaxy tool will load a jbrowse hub to Apollo instance for visualization and interactive annotation.
+        This Galaxy tool is used to create or overwrite an organism on an Apollo server with a jbrowse hub created by JBrowse Archive Creator. 
     </help>
     <citations>
     </citations>

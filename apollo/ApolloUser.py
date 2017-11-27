@@ -2,6 +2,7 @@
 
 
 import os
+import sys
 import json
 import logging
 from util import subtools
@@ -24,6 +25,14 @@ class ApolloUser(object):
             elif user['batch'] == "true":
                 users = self.parseUserInfoFile(user['format'], user['false_path'])
                 for u in users:
+                    if not 'useremail' in u:
+                        self.logger.error("Cannot find useremail in the text file, make sure you use the correct header, see README file for examples.")
+                    if not 'firstname' in u:
+                        self.logger.error("Cannot find firstname in the text file, make sure you use the correct header, see README file for examples.")
+                    if not 'lastname' in u:
+                        self.logger.error("Cannot find lastname in the text file, make sure you use the correct header, see README file for examples.")
+                    if not 'password' in u:
+                        self.logger.error("Cannot find password in the text file, make sure you use the correct header, see README file for examples.")
                     subtools.arrow_create_user(u['useremail'], u['firstname'], u['lastname'], u['password'])
     
     
@@ -56,6 +65,8 @@ class ApolloUser(object):
             elif user['batch'] == "true":
                 users = self.parseUserInfoFile(user['format'], user['false_path']) 
                 for u in users:
+                    if not 'useremail' in u:
+                        self.logger.error("Cannot find useremail in the text file, make sure you use the correct header, see README file for examples.")
                     subtools.arrow_delete_user(u['useremail'])
 
     def addApolloUserToGroup(self):
@@ -65,6 +76,10 @@ class ApolloUser(object):
             elif user['batch'] == "true":
                 users = self.parseUserInfoFile(user['format'], user['false_path'])
                 for u in users:
+                    if not 'useremail' in u:
+                        self.logger.error("Cannot find useremail in the text file, make sure you use the correct header, see README file for examples.")
+                    if not 'group' in u:
+                        self.logger.error("Cannot find group in the text file, make sure you use the correct header, see README file for examples.")
                     subtools.arrow_add_to_group(u['group'], u['useremail'])
                 
     def removeApolloUserFromeGroup(self):
@@ -74,6 +89,10 @@ class ApolloUser(object):
             elif user['batch'] == "true":
                 users = self.parseUserInfoFile(user['format'], user['false_path'])
                 for u in users:
+                    if not 'useremail' in u:
+                        self.logger.error("Cannot find useremail in the text file, make sure you use the correct header, see README file for examples.")
+                    if not 'group' in u:
+                        self.logger.error("Cannot find group in the text file, make sure you use the correct header, see README file for examples.")
                     subtools.arrow_add_to_group(u['group'], u['useremail'])
                 
-            
+
