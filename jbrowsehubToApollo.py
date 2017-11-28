@@ -25,6 +25,7 @@ def main(argv):
 
     # Begin init variables
     extra_files_path = reader.getExtFilesPath()
+    jbrowse_hub = reader.getJBrowseHubDir()
     #user_email = reader.getUserEmail() 
     species_name = reader.getSpeciesName() 
     #apollo_host = reader.getApolloHost()
@@ -34,31 +35,22 @@ def main(argv):
     #apollo_user = reader.getApolloUser()
     apollo_admin_user = reader.getAdminUser()
     toolDirectory = reader.getToolDir()
-    #jbrowse_hub = reader.getJBrowseHubDir()
     debug_mode = reader.getDebugMode()
     action = reader.getAction()
 
     #### Logging management ####
     # If we are in Debug mode, also print in stdout the debug dump
-    log = Logger(tool_directory=toolDirectory, debug=debug_mode)
+    log = Logger(tool_directory=toolDirectory, debug=debug_mode, extra_files_path=extra_files_path)
     log.setup_logging()
 
-<<<<<<< HEAD
     logging.info("#### JBrowsehub To Apollo: Start to %s JBrowse Hub to Apollo instance: %s #### ", action, apollo_host)
-=======
-    logging.info("#### JBrowseArchiveCreator: Start to %s JBrowse Hub to Apollo instance: %s #### ", action, apollo_host)
->>>>>>> 8b9a3b41d4dd4689764592d278ec2d67f67fbca4
     logging.debug('JSON parameters: %s\n\n', json.dumps(reader.args))
 
     # Set up apollo
     apollo = ApolloInstance(apollo_host, apollo_admin_user, toolDirectory) 
-    jbrowse_hub_dir = _getHubDir(extra_files_path)
-<<<<<<< HEAD
+    jbrowse_hub_dir = _getHubDir(jbrowse_hub)
     apollo.manageApolloOrganism(species_name, jbrowse_hub_dir, action)  
-=======
-    apollo.loadHubToApollo(species_name, jbrowse_hub_dir, action) 
->>>>>>> 8b9a3b41d4dd4689764592d278ec2d67f67fbca4
-    outHtml(outputFile, apollo_host, species_name)
+    outHtml(outputFile, apollo_host, species_name, action)
 
     logging.info('#### JBrowsehub To Apollo: Congratulation! JBrowse Hub is uploaded! ####\n')
     
@@ -71,9 +63,12 @@ def _getHubDir(extra_files_path):
     logging.error("Cannot find jbrowsehub")
     exit(-1)
 
-def outHtml(outputFile, host_name, species_name):
+def outHtml(outputFile, host_name, species_name, action):
     with open(outputFile, 'w') as htmlfile:
-        htmlstr = 'The new Organism "%s" is created on Apollo: <br>' % species_name
+        if action == "add":
+            htmlstr = 'The Organism "%s" is added on Apollo: <br>' % species_name
+        elif action == "overwrite":
+            htmlstr = 'The Organism "%s" is overwritten on Apollo: <br>' % species_name
         jbrowse_hub = '<li><a href = "%s" target="_blank">View JBrowse Hub on Apollo</a></li>' % host_name
         htmlstr += jbrowse_hub
         htmlfile.write(htmlstr)     

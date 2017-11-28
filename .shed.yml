@@ -1,8 +1,10 @@
-categories: [Visualization]
-description: A tool to upload jbrowsehub to Apollo instance
-name: jbrowsehubtoapollo
+name: gonramp_apollo_tools
 owner: yating-l
-remote_repository_url: https://github.com/Yating-L/jbrowsehub-to-apollo.git
+remote_repository_url: https://github.com/Yating-L/suite_gonramp_apollo.git
+categories: 
+  - Visualization
+description: A suite of tools for managing a (local) Apollo server
+type: unrestricted
 exclude:
   - tool_test_output.html
   - tool_test_output.json

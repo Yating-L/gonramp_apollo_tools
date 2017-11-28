@@ -1,4 +1,4 @@
-Suite G-OnRamp Apollo
+G-OnRamp Apollo Tools
 =====================
 
 A suite of Galaxy tools for managing a local Apollo server. It includes following tools:

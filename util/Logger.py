@@ -32,6 +32,7 @@ class Logger(object):
                         config["handlers"][i]["filename"] = os.path.join(self.extra_files_path, config["handlers"][i]["filename"])
                 logging.config.dictConfig(config)
             else:
+                logging.config.dictConfig(config)
                 logging.warn("Extra files path is not set. The log files will exist at current working directory instead of final output folder")
         else:
             logging.basicConfig(level=default_level)

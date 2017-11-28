@@ -45,16 +45,16 @@ class ApolloUser(object):
             self.logger.error("The %s format is not supported!", file_format)
         with open(filename, 'r') as f:
             lines = f.readlines()
-        headers = lines[0].rstrip().split(delimiter)
+        headers = lines[0].split(delimiter)
         users = []
         lines = lines[1:]
         for l in lines:
-            print l
             l = l.split(delimiter)
             info = dict()
             fields = len(l)
             for i in range(fields):
-                info[headers[i]] = l[i]
+                title = headers[i].rstrip()
+                info[title] = l[i].rstrip()
             users.append(info)
         return users
 
@@ -93,6 +93,6 @@ class ApolloUser(object):
                         self.logger.error("Cannot find useremail in the text file, make sure you use the correct header, see README file for examples.")
                     if not 'group' in u:
                         self.logger.error("Cannot find group in the text file, make sure you use the correct header, see README file for examples.")
-                    subtools.arrow_add_to_group(u['group'], u['useremail'])
+                    subtools.arrow_remove_from_group(u['group'], u['useremail'])
                 
 

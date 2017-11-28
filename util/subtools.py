@@ -115,8 +115,8 @@ def arrow_create_user(user_email, firstname, lastname, password, admin=False):
     if "userId" in j:
         return j['userId']
     elif "error" in j:
-        logging.error("User %s already exist", user_email)
-        raise Exception(j['error'])
+        logging.error("Got error message: %s", j['error'])
+        exit(-1)
         
         
 def arrow_delete_user(user_email):
@@ -124,7 +124,8 @@ def arrow_delete_user(user_email):
     p = _handleExceptionAndCheckCall(array_call)
     j = json.loads(p)
     if "error" in j:
-        raise Exception(j['error'])
+        logging.error("Got error message: %s", j['error'])
+        exit(-1)
 
 def arrow_add_to_group(groupname, user_email):
     if not arrow_get_groups(groupname):
@@ -133,19 +134,22 @@ def arrow_add_to_group(groupname, user_email):
     p = _handleExceptionAndCheckCall(array_call)
     j = json.loads(p)
     if j != dict():
-        raise Exception("Error add user %s to group %s", user_email, groupname)
+        logging.error("Error add user %s to group %s. The user doesn't exist", user_email, groupname)
 
 
 def arrow_remove_from_group(groupname, user_email):
     if arrow_get_groups(groupname):
         array_call = ['arrow', 'users', 'remove_from_group', groupname, user_email]
         p = _handleExceptionAndCheckCall(array_call)
+        j = json.loads(p)
+        if j != dict():
+            logging.error("Error remove user %s to group %s. The user doesn't exist", user_email, groupname)
     else:
-        raise Exception("Group %s doesn't exist. Check if you spell the name correctly", groupname)
+        logging.error("Group %s doesn't exist. Check if you spell the name correctly", groupname)
 
 def arrow_create_group(groupname):
     if arrow_get_groups(groupname):
-        raise Exception("Group %s already exist. Create a group with another name.", groupname)
+        logging.error("Group %s already exist. Create a group with another name.", groupname)
     array_call = ['arrow', 'groups', 'create_group', groupname]
     p = _handleExceptionAndCheckCall(array_call)
 
@@ -179,22 +183,22 @@ def arrow_get_users(user_email):
     array_call = ['arrow', 'users', 'get_users']
     p = _handleExceptionAndCheckCall(array_call)
     all_users = json.loads(p)
-    for d  in all_users:
+    for d in all_users:
         if d['username'] == user_email:
             return d['userId']
     logging.error("Cannot find user %s", user_email)
 
 def arrow_get_organism(organism_name):
-    array_call= ['arrow', 'organisms', 'get_organisms']
+    array_call= ['arrow', 'organisms', 'get_organisms', '--common_name', organism_name]
     p = _handleExceptionAndCheckCall(array_call)
-    all_organisms = json.loads(p)
-    for org in all_organisms:
-        if org['commonName'] == organism_name:
-            return org['id']
-    
+    org = json.loads(p)
+    if 'error' not in org:
+        return org[0]['id']
+    else:
+        logging.debug("Got error msg %s when look for organism %s.", org['error'], organism_name)
 
 def arrow_delete_organism(organism_id):
-    array_call = ['arrow', 'organisms', 'delete_organism', organism_id]
+    array_call = ['arrow', 'organisms', 'delete_organism', str(organism_id)]
     p = _handleExceptionAndCheckCall(array_call)
     return p
     

@@ -12,7 +12,7 @@ class ApolloOrganism(object):
         self.logger = logging.getLogger(__name__)
 
     def addOrganism(self):
-        exist = self.getOrganism(self.organism_name)
+        exist = subtools.arrow_get_organism(self.organism_name)
         if not exist:
             self.logger.debug("The organism does not exist.")
             p = subtools.arrow_add_organism(self.organism_name, self.organism_dir)
@@ -29,11 +29,11 @@ class ApolloOrganism(object):
 
     #TODO: the JSON dictionary return by deleteOrganism still contains the deleted organism. Improve the API.
     def deleteOrganism(self):
-        organism_id = self.getOrganism(self.organism_name)
+        organism_id = subtools.arrow_get_organism(self.organism_name)
         if organism_id:
             self.logger.debug("Deleting the organism %s", self.organism_name)
             subtools.arrow_delete_organism(organism_id)
-            if not self.getOrganism(self.organism_name):
+            if not subtools.arrow_get_organism(self.organism_name):
                 self.logger.debug("Organism %s has been deleted", self.organism_name)
             else:
                 self.logger.error("Organism %s cannot be deleted", self.organism_name)
@@ -41,13 +41,6 @@ class ApolloOrganism(object):
         else:
             self.logger.error("Organism %s doesn't exist", self.organism_name)
             exit(-1)
-
-    #TODO: filtering by commonName doesn't work. Improve the API.
-    @staticmethod
-    def getOrganism(organism_name):
-        p = subtools.arrow_get_organism(organism_name)
-        if p:
-            return str(p)
 
     #TODO: API update_organism not working. Improve the API to enable updating directory.
     def overwriteOrganism(self):

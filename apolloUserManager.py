@@ -30,20 +30,16 @@ def main(argv):
     apollo_host = "http://localhost:"+ apollo_port + "/apollo"
     apollo_admin_user = reader.getAdminUser()
     toolDirectory = reader.getToolDir()
+    extra_files_path = reader.getExtFilesPath()
     debug_mode = reader.getDebugMode()
-
     operations_dictionary = reader.getOperationList()
-    #OPERATIONS = ['create', 'delete', 'add', 'remove']
-    #create_user_list = reader.getOperationList("create")
-    #delete_user_list = reader.getOperationList("delete")
-    #remove_user_list = reader.getOperationList("remove")
-    #add_user_list = reader.getOperationList("add")
+    
 
     
         
     #### Logging management ####
     # If we are in Debug mode, also print in stdout the debug dump
-    log = Logger(tool_directory=toolDirectory, debug=debug_mode)
+    log = Logger(tool_directory=toolDirectory, debug=debug_mode, extra_files_path=extra_files_path)
     log.setup_logging()
 
     logging.info("#### Apollo User Manager: Start on Apollo instance: %s #### ", apollo_host)
@@ -52,11 +48,16 @@ def main(argv):
     # Set up apollo
     apollo = ApolloInstance(apollo_host, apollo_admin_user, toolDirectory) 
     apollo.manageApolloUser(operations_dictionary)
-    
+    outHtml(outputFile, apollo_host)
     logging.info('#### Apollo User Manager: Congratulation! ####\n')
-    
 
-
+def outHtml(outputFile, host_name):
+    with open(outputFile, 'w') as htmlfile:
+        htmlstr = 'The Apollo User Manager has done with operations on Apollo: <br>'
+        jbrowse_hub = '<li><a href = "%s" target="_blank">View JBrowse Hub on Apollo</a></li>' % host_name
+        htmlstr += jbrowse_hub
+        htmlfile.write(htmlstr)     
+        
 
 if __name__ == "__main__":
     main(sys.argv)

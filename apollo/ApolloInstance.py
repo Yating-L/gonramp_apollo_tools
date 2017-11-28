@@ -74,7 +74,7 @@ class ApolloInstance(object):
                 apollo_user.deleteApolloUser()
             elif operation == "add":
                 apollo_user.addApolloUserToGroup()
-            elif operation == "delete":
+            elif operation == "remove":
                 apollo_user.removeApolloUserFromeGroup()
 
     

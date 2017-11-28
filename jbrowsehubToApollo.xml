@@ -11,7 +11,7 @@
     </stdio>
 
     <command detect_errors="exit_code"><![CDATA[
-
+        mkdir -p $output.extra_files_path;
         ## Dump the tool parameters into a JSON file 
         python $json_file parameters.json;
         python $__tool_directory__/jbrowsehubToApollo.py --data_json parameters.json -o $output
@@ -24,11 +24,13 @@ import sys
 file_path = sys.argv[1]
 #set global data_parameter_dict = {}
 #silent $data_parameter_dict.update({"action": str($action)})
+#silent $data_parameter_dict.update({"action": str($action)})
 #silent $data_parameter_dict.update({"species_name": str($species_name)})
 #set apollo_admin = {"user_email": str($admin_username), "password": str($admin_password)}
 #silent $data_parameter_dict.update({"apollo_admin": $apollo_admin})
 #silent $data_parameter_dict.update({"tool_directory": str($__tool_directory__)})
-#silent $data_parameter_dict.update({"extra_files_path": str($jbrowse_hub.extra_files_path)})
+#silent $data_parameter_dict.update({"extra_files_path": str($output.extra_files_path)})
+#slient $data_parameter_dict.update({"jbrowse_hub": str($jbrowse_hub.extra_files_path)})
 #silent $data_parameter_dict.update({"port": str($advanced_options.port)})
 #silent $data_parameter_dict.update({"debug_mode": str($advanced_options.debug_mode)})
 with open(file_path, 'w') as f:
